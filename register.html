@@ -12,10 +12,15 @@
             background-color: #5d8aab;
             color: white;
             font-family: Arial, sans-serif;
+        }
+
+        .container {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         #register-container {
@@ -25,17 +30,17 @@
             max-width: 400px;
             width: 100%;
             text-align: center;
+            margin-bottom: 20px;
         }
 
         input {
             margin: 10px 0;
             text-align: center;
-            background-color: #5d8aab;
             border: none;
             height: 40px;
             width: 100%;
             border-radius: 5px;
-            color: white;
+    
         }
 
         button {
@@ -54,15 +59,54 @@
         h3 {
             color: #fafafa;
         }
+
+        .overview {
+            background-color: #003b4c;
+            padding: 20px;
+            border-radius: 10px;
+            color: #fafafa;
+            max-width: 500px;
+            width: 100%;
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .overview h2 {
+            margin-top: 0;
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 10px;
+            }
+
+            #register-container, .overview {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            input, button {
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="register-container">
-        <h3>Register</h3>
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button onclick="register()">Register</button>
-        <p id="error-message" style="color: red;"></p>
+    <div class="container">
+        <div class="overview">
+            <h2>Game Overview</h2>
+            <p><strong>About the Game:</strong> The Typing Game is designed to help you improve your typing speed and accuracy. With different difficulty levels, you can challenge yourself and track your progress over time.</p>
+            <p><strong>How to Play:</strong> Choose a difficulty level to start the game. Type the word displayed on the screen as quickly and accurately as possible before the time runs out. Your score increases with each correct word typed.</p>
+            <p><strong>Benefits:</strong> This game helps you enhance your typing skills, build muscle memory, and increase your typing speed. It's perfect for practice and improvement.</p>
+        </div>
+
+        <div id="register-container">
+            <h3>Register</h3>
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button onclick="register()">Register</button>
+            <p id="error-message" style="color: red;"></p>
+        </div>
     </div>
 
     <script>
