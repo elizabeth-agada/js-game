@@ -73,6 +73,11 @@
             margin: 20px auto;
         }
 
+        .username {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
         @media (max-width: 768px) {
             button {
                 width: 100%;
@@ -94,6 +99,7 @@
     <div id="cover">
         <div id="inner">
             <header class="text-center">
+                <div class="username" id="username-display"></div>
                 <h5 id="optionBtn"><p id="level">Levels:</p></h5>
             </header>
             <button id="easy">easy 🐷</button>
@@ -121,6 +127,18 @@
                 </div>
             </div>
             <input type="text" placeholder="Pro Tip: Sometimes it's faster to delete all and just retype!" id="input2">
+
+            <!-- Leaderboard Section -->
+            <div class="mt-4">
+                <button onclick="showModal()">Submit Score</button>
+                <a href="leaderboard.html" class="btn btn-secondary">View Leaderboard</a>
+            </div>
+        </div>
+        <div id="usernameModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.3);">
+            <h3>Enter your username:</h3>
+            <input type="text" id="usernameInput" placeholder="Username">
+            <button onclick="submitUsername()">Submit</button>
+            <button onclick="closeModal()">Cancel</button>
         </div>
     </div>
     
@@ -152,90 +170,101 @@
         const easyBtn = document.querySelector('#easy');
         const mediumBtn = document.querySelector('#medium');
         const hardBtn = document.querySelector('#hard');
-
-        const words = [
-            'grid', 'swift', 'rails', 'ruby', 'python', 'java', 'tech', 'clear', 'echo', 'let',
-            'wall', 'laughter', 'hash', 'kotlin', 'mobile', 'android', 'javascript', 'web', 'program',
-            'coding', 'basic', 'foodie', 'work', 'case', 'react', 'dragon', 'rush', 'api', 'virtual',
-            'nerd', 'google', 'float', 'docker', 'block', 'rank', 'class', 'machine', 'perfect',
-            'deploy', 'terminal', 'array', 'vue', 'node', 'issue', 'front', 'grid', 'geek', 'mac',
-            'console', 'clone', 'heroku', 'slack', 'version', 'control', 'data', 'npm', 'developer'
-        ];
-
-        function setlevel(e) {
-            if (e.target === easyBtn) {
-                currentLevel = levels.easy;
-            } else if (e.target === mediumBtn) {
-                currentLevel = levels.medium;
-            } else if (e.target === hardBtn) {
-                currentLevel = levels.hard;
-            }
-            init();
-        }
+        const usernameDisplay = document.querySelector('#username-display');
 
         function init() {
-            seconds.innerHTML = currentLevel;
-            showWord(words);
-            wordInput.addEventListener('input', startMatch);
-            setInterval(countdown, 1000);
-            setInterval(checkStatus, 50);
-            maxScore = localStorage.getItem('highScore') || 0;
-            highScoreElt.innerHTML = maxScore;
+            const savedUsername = localStorage.getItem('username');
+            if (savedUsername) {
+                usernameDisplay.innerHTML = `Welcome, ${savedUsername}!`;
+            } else {
+                window.location.href = 'register.html';
+            }
+            setInterval(updateTime, 1000);
         }
 
-        function startMatch() {
-            wordInput.value = wordInput.value.toLowerCase();
-            if (matchWords()) {
-                isPlaying = true;
-                time = currentLevel + 1;
-                showWord(words);
-                wordInput.value = '';
-                score++;
-            }
+        function setlevel(e) {
+            currentLevel = levels[e.target.id];
+            seconds.innerHTML = currentLevel;
+            time = currentLevel;
+            generateWord();
+            wordInput.focus();
+            score = 0;
+            scoreDisplay.innerHTML = score;
+            isPlaying = true;
+        }
 
-            if (score === -1) {
-                scoreDisplay.innerHTML = 0;
-            } else {
-                scoreDisplay.innerHTML = score;
-                highScoreElt.innerHTML = score;
-
-                if (score >= maxScore) {
-                    localStorage.setItem('highScore', score);
+        function updateTime() {
+            if (isPlaying) {
+                if (time > 0) {
+                    time--;
+                    timeDisplay.innerHTML = time;
+                } else {
+                    isPlaying = false;
+                    checkStatus();
                 }
             }
-            maxScore = localStorage.getItem('highScore');
-            scoreDisplay.innerHTML = score;
         }
 
-        function matchWords() {
-            if (wordInput.value === currentWord.innerHTML) {
-                message.innerHTML = 'Great 👌';
-                return true;
-            } else {
-                message.innerHTML = '🙄';
-                return false;
+        function generateWord() {
+            const words = ['example', 'keyboard', 'game', 'javascript', 'coding'];
+            const randomIndex = Math.floor(Math.random() * words.length);
+            currentWord.innerHTML = words[randomIndex];
+        }
+
+        wordInput.addEventListener('input', (e) => {
+            if (e.target.value === currentWord.innerHTML) {
+                score++;
+                scoreDisplay.innerHTML = score;
+                e.target.value = '';
+                generateWord();
+                time = currentLevel;
             }
-        }
-
-        function showWord(words) {
-            const randIndex = Math.floor(Math.random() * words.length);
-            currentWord.innerHTML = words[randIndex];
-        }
-
-        function countdown() {
-            if (time > 0) {
-                time--;
-            } else if (time === 0) {
-                isPlaying = false;
-            }
-            timeDisplay.innerHTML = time;
-        }
+        });
 
         function checkStatus() {
             if (!isPlaying && time === 0) {
-                message.innerHTML = 'Game Over!';
-                score = -1;
+                message.innerHTML = 'Game Over 😑';
+                updateHighScore();
             }
+        }
+
+        function updateHighScore() {
+            const savedHighScore = localStorage.getItem('highScore') || 0;
+            if (score > savedHighScore) {
+                localStorage.setItem('highScore', score);
+                highScoreElt.innerHTML = score;
+            }
+        }
+
+        function showModal() {
+            document.getElementById('usernameModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('usernameModal').style.display = 'none';
+        }
+
+        function submitUsername() {
+            const username = document.getElementById('usernameInput').value;
+            if (username) {
+                localStorage.setItem('username', username);
+                closeModal();
+                displayUsername();
+                showLeaderboard();
+            }
+        }
+
+        function displayUsername() {
+            const currentUser = localStorage.getItem('username');
+            if (currentUser) {
+                usernameDisplay.innerHTML = `Welcome, ${currentUser}!`;
+            } else {
+                usernameDisplay.innerHTML = 'Welcome, Guest!';
+            }
+        }
+
+        function showLeaderboard() {
+            window.location.href = 'leaderboard.html';
         }
 
         easyBtn.addEventListener('click', setlevel);

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <title>Register</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #5d8aab;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #register-container {
+            background-color: #004562;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        input {
+            margin: 10px 0;
+            text-align: center;
+            background-color: #5d8aab;
+            border: none;
+            height: 40px;
+            width: 100%;
+            border-radius: 5px;
+            color: white;
+        }
+
+        button {
+            margin: 10px;
+            background-color: #5d8aab;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #004562;
+        }
+
+        h3 {
+            color: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <div id="register-container">
+        <h3>Register</h3>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button onclick="register()">Register</button>
+        <p id="error-message" style="color: red;"></p>
+    </div>
+
+    <script>
+        function register() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+
+            if (username && password) {
+                // Save user info in local storage (basic example)
+                localStorage.setItem('username', username);
+                localStorage.setItem('password', password);
+                window.location.href = 'index.html'; // Redirect to game page
+            } else {
+                errorMessage.textContent = 'Please enter both username and password.';
+            }
+        }
+    </script>
+</body>
+</html>
