@@ -1,97 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+	<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <title>Leaderboard</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
             background-color: #5d8aab;
             color: white;
-            font-family: Arial, sans-serif;
-        }
-
-        #leaderboard {
-            padding: 30px;
             text-align: center;
-        }
-
-        h2 {
-            margin-bottom: 30px;
-        }
-
-        .btn-back {
-            margin-top: 20px;
+            padding: 20px;
         }
 
         table {
-            margin: 0 auto;
-            max-width: 600px;
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
         }
 
         th, td {
             padding: 10px;
-            border: 1px solid white;
+            border: 1px solid #004562;
         }
 
         th {
             background-color: #004562;
         }
-
-        td {
-            background-color: #004040;
-        }
-
-        @media (max-width: 768px) {
-            table {
-                width: 100%;
-            }
-
-            th, td {
-                font-size: 14px;
-                padding: 5px;
-            }
-        }
     </style>
-</head>
-<body>
-    <div id="leaderboard">
-        <h2>Leaderboard</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Score</th>
-                </tr>
-            </thead>
-            <tbody id="leaderboardBody">
-            </tbody>
-        </table>
-        <button class="btn btn-primary btn-back" onclick="window.location.href='index.html'">Back to Game</button>
-    </div>
-    
+	</head>
+	<body>
+    <h1>Leaderboard</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboard">
+            <!-- Leaderboard entries will be inserted here -->
+        </tbody>
+    </table>
+    <a href="index.html" style="color: #fafafa; text-decoration: none; padding: 10px; border-radius: 5px; background-color: #004562;">Back to Game</a>
+
     <script>
-        function displayLeaderboard() {
-            const leaderboardBody = document.getElementById('leaderboardBody');
-            const scores = [];
+        window.addEventListener('load', function() {
+            const leaderboardElt = document.querySelector('#leaderboard');
+            const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
 
-            for (let i = 0; i < localStorage.length; i++) {
-                const username = localStorage.key(i);
-                const score = localStorage.getItem(username);
-                scores.push({ username, score });
-            }
-
-            scores.sort((a, b) => b.score - a.score);
-
-            scores.forEach(entry => {
+            highScores.forEach(entry => {
                 const row = document.createElement('tr');
-                row.innerHTML = `<td>${entry.username}</td><td>${entry.score}</td>`;
-                leaderboardBody.appendChild(row);
+                const usernameCell = document.createElement('td');
+                usernameCell.textContent = entry.username;
+                const scoreCell = document.createElement('td');
+                scoreCell.textContent = entry.score;
+                row.appendChild(usernameCell);
+                row.appendChild(scoreCell);
+                leaderboardElt.appendChild(row);
             });
-        }
-
-        window.addEventListener('load', displayLeaderboard);
+        });
     </script>
-</body>
+	</body>
 </html>
