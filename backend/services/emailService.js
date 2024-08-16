@@ -1,25 +1,22 @@
-// emailService.js
 const nodemailer = require('nodemailer');
 
-// Create a transporter object using the default SMTP transport
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,   // Your Gmail address
-    pass: process.env.EMAIL_PASS    // Your app password
-  }
-});
+const sendEmail = async (to, subject, text) => {
+    let transporter = nodemailer.createTransport({
+        service: 'gmail', // Use your email service provider
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        }
+    });
 
-// Function to send an email
-const sendEmail = (to, subject, text) => {
-  const mailOptions = {
-    from: process.env.EMAIL,
-    to,
-    subject,
-    text
-  };
+    let info = await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to,
+        subject,
+        text
+    });
 
-  return transporter.sendMail(mailOptions);
+    console.log('Message sent: %s', info.messageId);
 };
 
 module.exports = sendEmail;

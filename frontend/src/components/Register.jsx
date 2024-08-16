@@ -8,14 +8,18 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const [loading, setLoading] = useState(false); // New loading state
     const navigate = useNavigate();
 
     const handleRegister = async () => {
         if (email && username && password) {
+            setLoading(true); // Start loading
             try {
                 const response = await axios.post('http://localhost:5001/api/register', { email, username, password });
+                setLoading(false); // Stop loading
                 setSuccessMessage(response.data.message);
             } catch (error) {
+                setLoading(false); // Stop loading
                 if (error.response) {
                     setErrorMessage(error.response.data.message || 'Registration failed. Please try again.');
                 } else {
@@ -59,8 +63,9 @@ const Register = () => {
                 <button
                     onClick={handleRegister}
                     className="block w-full py-2 rounded bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    disabled={loading} // Disable button when loading
                 >
-                    Register
+                    {loading ? 'Registering...' : 'Register'} {/* Show different text when loading */}
                 </button>
                 <button
                     onClick={handleLoginRedirect}
@@ -68,6 +73,8 @@ const Register = () => {
                 >
                     Go to Login
                 </button>
+                {loading && <div className="spinner"></div>}
+
                 {errorMessage && <p className="text-red-400 mt-2">{errorMessage}</p>}
                 {successMessage && <p className="text-green-400 mt-2">{successMessage}</p>}
             </div>

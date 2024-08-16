@@ -1,15 +1,11 @@
-// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const sendEmail = require('./services/emailService'); // Correct path
+const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 require('dotenv').config();
-
-
-
 
 const app = express();
 
@@ -22,11 +18,13 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log(err));
 
-// Define models
+// Models
 const User = require('./models/User');
-const Score = require('./models/Score');
 
-// Register a new user
+// Send email function
+const sendEmail = require('./services/emailService');
+
+// Register User Route
 app.post('/api/register', async (req, res) => {
   const { email, username, password } = req.body;
   try {
@@ -36,20 +34,21 @@ app.post('/api/register', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
 
     const newUser = new User({
       email,
       username,
       password: hashedPassword,
-      verificationToken: crypto.randomBytes(32).toString('hex'),
+      verificationToken,
       isVerified: false
     });
 
     await newUser.save();
 
-    // Send verification email
-    const verificationLink = `${process.env.CLIENT_URL}/verify-email/${newUser.verificationToken}`;
-    await sendEmail(email, 'Verify your email', `Please verify your email by clicking the following link: ${verificationLink}`);
+    const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
+
+    await sendEmail(email, 'Verify your email', `Click this link to verify your email: ${verificationUrl}`);
 
     res.status(201).json({ message: 'User registered. Please check your email to verify your account.' });
   } catch (err) {
@@ -57,26 +56,37 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Verify email
-app.get('/api/verify-email/:token', async (req, res) => {
-  const { token } = req.params;
+app.post('/api/verify-email', async (req, res) => {
+  const { token } = req.body;
+
   try {
-    const user = await User.findOne({ verificationToken: token });
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid verification token' });
-    }
+      console.log("Received token:", token);  // Log the received token
 
-    user.isVerified = true;
-    user.verificationToken = null;
-    await user.save();
+      const user = await User.findOne({ where: { verificationToken: token } });
 
-    res.status(200).json({ message: 'Email verified successfully. You can now log in.' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+      console.log("User found:", user);  // Log the user object or null if not found
+
+      if (!user) {
+          console.log("Token is invalid or expired.");  // Log when the token is invalid
+          return res.status(400).json({ message: 'Invalid or expired token' });
+      }
+
+      user.isVerified = true;
+      user.verificationToken = null; // Clear the token after verification
+      await user.save();
+
+      console.log("User verification status updated:", user.isVerified);  // Log the updated verification status
+
+      res.json({ message: 'Email verified successfully!' });
+  } catch (error) {
+      console.error("Error during verification:", error);  // Log any errors that occur
+      res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 });
 
-// Log in a user
+
+
+// Login Route
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -91,28 +101,6 @@ app.post('/api/login', async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.json({ token });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Post a new score
-app.post('/api/score', async (req, res) => {
-  const { username, score } = req.body;
-  try {
-    const newScore = new Score({ username, score });
-    await newScore.save();
-    res.json(newScore);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Get the leaderboard
-app.get('/api/leaderboard', async (req, res) => {
-  try {
-    const scores = await Score.find().sort({ score: -1 }).limit(10);
-    res.json(scores);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
