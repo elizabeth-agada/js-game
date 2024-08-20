@@ -10,14 +10,14 @@ function VerifyEmail() {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const response = await axios.get(`/api/verify-email/${token}`);
-        setMessage(response.data.message || 'Email verified successfully! You can now log in.');
+        const response = await axios.post('/api/verify-email', { token });
+        console.log("Verification response:", response.data);
+        setMessage('Email verified successfully! You can now log in.');
       } catch (error) {
-        console.error('Verification error:', error.response?.data || error.message);
-        setMessage(error.response?.data.message || 'Verification failed. Please check the link or try again.');
+        console.error("Verification failed:", error.response ? error.response.data : error.message);
+        setMessage('Verification failed. Please check the link or try again.');
       }
     };
-
     verifyToken();
   }, [token]);
 
