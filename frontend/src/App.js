@@ -5,6 +5,7 @@ import Login from './components/Login';
 import Game from './components/Game';
 import Leaderboard from './components/Leaderboard';
 import VerifyEmail from './components/VerifyEmail';
+import WelcomeMessage from './components/WelcomeMessage';
 
 const App = () => {
     return (
@@ -15,6 +16,7 @@ const App = () => {
                 <Route path="/game" element={<Game />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/verify-email/:token" element={<VerifyEmail />} />
+                <Route path="/WelcomeMessage" element={<WelcomeMessage />} />
             </Routes>
         </Router>
     );

@@ -19,10 +19,10 @@ const Login = () => {
     
                 // Store the token in localStorage (if your API sends a token)
                 const token = response.data.token; // Adjust this based on your API response
-                localStorage.setItem('token', token); // Save the token
+                localStorage.setItem('token', token); 
     
-                // Redirect to the dashboard
-                navigate('/game'); // Uncomment if you want to redirect to the dashboard page
+                // Redirect to the game
+                navigate('/game'); 
             } catch (error) {
                 if (error.response) {
                     // Backend returned an error response
