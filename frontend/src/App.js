@@ -6,11 +6,13 @@ import Game from './components/Game';
 import Leaderboard from './components/Leaderboard';
 import VerifyEmail from './components/VerifyEmail';
 import WelcomeMessage from './components/WelcomeMessage';
+import UserInfo from './components/UserInfo';
 
 const App = () => {
     return (
         <Router>
             <Routes>
+                <Route path="/userinfo" element={<UserInfo />} />
                 <Route path="/" element={<Register />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/game" element={<Game />} />

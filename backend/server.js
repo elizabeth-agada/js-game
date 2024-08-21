@@ -105,6 +105,19 @@ app.post('/api/verify-email', async (req, res) => {
   }
 });
 
+// Middleware to authenticate token
+const authenticateToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) return res.sendStatus(401); // Unauthorized
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403); // Forbidden
+    req.user = user; // Attach user info to request
+    next();
+  });
+};
+
 // Login Route
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
@@ -117,26 +130,22 @@ app.post('/api/login', async (req, res) => {
       return res.status(403).json({ message: 'Email not verified' });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    // Include username in the token payload
+    const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Score Submission Route
-app.post('/api/scores', async (req, res) => {
-  const { score } = req.body;
-  const token = req.headers.authorization?.split(" ")[1];
 
-  if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
+// Score Submission Route
+// Score Submission Route
+app.post('/api/scores', authenticateToken, async (req, res) => {
+  const { score } = req.body;
+  const userId = req.user.userId; // Get user ID from the decoded token
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.userId;
-
     const newScore = new Score({
       user: userId,
       score,
@@ -145,7 +154,7 @@ app.post('/api/scores', async (req, res) => {
     await newScore.save();
     res.status(201).json({ message: 'Score submitted successfully' });
   } catch (error) {
-    console.error("Error submitting score:", error); // Log the error
+    console.error("Error submitting score:", error);
     res.status(500).json({ message: 'Error submitting score' });
   }
 });
