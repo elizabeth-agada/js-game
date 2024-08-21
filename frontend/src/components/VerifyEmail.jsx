@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 function VerifyEmail() {
   const { token } = useParams();
   const [message, setMessage] = useState('');
@@ -10,7 +12,7 @@ function VerifyEmail() {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const response = await axios.post('/api/verify-email', { token });
+        const response = await axios.post(`${API_URL}/api/verify-email`, { token });
         console.log("Verification response:", response.data);
         setMessage('Email verified successfully! You can now log in.');
       } catch (error) {

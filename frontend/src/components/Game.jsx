@@ -4,16 +4,11 @@ import { useNavigate } from 'react-router-dom';
 const levels = {
   easy: 5,
   medium: 3,
-  hard: 2
+  hard: 2,
 };
 
 const words = [
-  'grid', 'swift', 'rails', 'ruby', 'python', 'java', 'tech', 'clear', 'echo', 'let',
-  'wall', 'laughter', 'hash', 'kotlin', 'mobile', 'android', 'javascript', 'web', 'program',
-  'coding', 'basic', 'foodie', 'work', 'case', 'react', 'dragon', 'rush', 'api', 'virtual',
-  'nerd', 'google', 'float', 'docker', 'block', 'rank', 'class', 'machine', 'perfect',
-  'deploy', 'terminal', 'array', 'vue', 'node', 'issue', 'front', 'grid', 'geek', 'mac',
-  'console', 'clone', 'heroku', 'slack', 'version', 'control', 'data', 'npm', 'developer'
+  // Your list of words...
 ];
 
 function Game() {
@@ -31,7 +26,7 @@ function Game() {
 
   const navigate = useNavigate();
 
-  // Function to update high scores
+  // Update high scores
   const updateHighScores = useCallback(() => {
     const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
     if (username) {
@@ -43,18 +38,17 @@ function Game() {
       } else {
         highScores.push({ username, score });
       }
-  
+
       highScores.sort((a, b) => b.score - a.score);
       localStorage.setItem('highScores', JSON.stringify(highScores));
     }
   }, [score, username]);
-  
-  // Function to end the game
+
   const endGame = useCallback(() => {
     setIsPlaying(false);
     setMessage('Game Over!');
     setFinalScore(score);
-    updateHighScores(); // Call to update high scores
+    updateHighScores();
     setShowGameOverModal(true);
   }, [score, updateHighScores]);
 
@@ -88,11 +82,10 @@ function Game() {
     if (wordInput.toLowerCase() === currentWord.toLowerCase()) {
       setScore(prevScore => prevScore + 1);
       setWordInput('');
-      generateWord(); // Generate a new word immediately
-      setTime(currentLevel); // Reset the timer
+      generateWord();
+      setTime(currentLevel);
       setMessage('Good Job!');
 
-      // Update high score if necessary
       if (score + 1 > highScore) {
         localStorage.setItem('highScore', score + 1);
         setHighScore(score + 1);
@@ -117,7 +110,6 @@ function Game() {
     navigate('/leaderboard');
   }
 
-  // Logout function
   function handleLogout() {
     localStorage.removeItem('username');
     localStorage.removeItem('highScore');
@@ -132,22 +124,13 @@ function Game() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-blue-500 text-white p-6">
       <header className="text-center mb-6">
-        <div id="username-display" className="text-xl font-semibold">
-          {username && `Welcome, ${username}!`}
+        <div id="username-display" className="text-xl font-semibold mb-4">
+          {username ? `Welcome, ${username}!` : 'Welcome, Guest!'}
         </div>
         <div id="level" className="text-lg">
+          <h2 className="text-lg font-bold text-red-900">Select a Level to begin</h2>
           Current Level: <span id="current-level" className="font-bold">{Object.keys(levels).find(key => levels[key] === currentLevel)}</span>
         </div>
-         {/* Logout Button */}
-         {username && (
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-400 text-white py-2 px-4 rounded mt-4"
-          >
-            Logout
-          </button>
-        )}
-       
       </header>
       <div className="flex gap-4 mb-4">
         <button onClick={() => setLevel('easy')} className="bg-green-500 hover:bg-green-400 text-white py-2 px-4 rounded">Easy 🐷</button>
@@ -168,7 +151,7 @@ function Game() {
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
-            checkWord(); // Call checkWord on Enter key press
+            checkWord();
           }
         }}
         placeholder="Type the word..."
@@ -194,10 +177,17 @@ function Game() {
             >
               Go to Leaderboard
             </button>
-             
           </div>
-         
         </div>
+      )}
+      {/* Logout Button at the bottom */}
+      {username && (
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 hover:bg-red-400 text-white py-2 px-4 rounded mt-4 self-center"
+        >
+          Logout
+        </button>
       )}
     </div>
   );

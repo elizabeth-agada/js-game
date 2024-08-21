@@ -13,12 +13,16 @@ const Login = () => {
         if (email && password) {
             try {
                 const response = await axios.post('http://localhost:5001/api/login', { email, password });
-
+    
                 // Show a success message
                 setSuccessMessage(response.data.message);
-
-                // Optionally redirect to another page, like a dashboard
-                // navigate('/dashboard'); // Uncomment if you want to redirect to the dashboard page
+    
+                // Store the token in localStorage (if your API sends a token)
+                const token = response.data.token; // Adjust this based on your API response
+                localStorage.setItem('token', token); // Save the token
+    
+                // Redirect to the dashboard
+                navigate('/game'); // Uncomment if you want to redirect to the dashboard page
             } catch (error) {
                 if (error.response) {
                     // Backend returned an error response
@@ -32,6 +36,7 @@ const Login = () => {
             setErrorMessage('Please enter all fields.');
         }
     };
+    
 
     const handleRegisterRedirect = () => {
       navigate('/'); // Redirect to the register page

@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
+
 app.use(cors());
 app.use(express.json());
 
@@ -58,32 +58,35 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/verify-email', async (req, res) => {
   const { token } = req.body;
+  console.log("Received token:", token);  // Log the received token
 
   try {
-    console.log("Received token:", token);  // Log the received token
+      const user = await User.findOne({ verificationToken: token }); // Fix this line
+      console.log("User found:", user);  // Log the user object or null if not found
 
-    // Find the user by the verification token
-    const user = await User.findOne({ verificationToken: token });
+      if (!user) {
+          console.log("Token is invalid or expired.");  // Log when the token is invalid
+          return res.status(400).json({ message: 'Invalid or expired token' });
+      }
 
-    console.log("User found:", user);  // Log the user object or null if not found
+      if (user.isVerified) {
+          console.log("User already verified");
+          return res.status(400).json({ message: 'User already verified' });
+      }
 
-    if (!user) {
-      console.log("Token is invalid or expired.");  // Log when the token is invalid
-      return res.status(400).json({ message: 'Invalid or expired token' });
-    }
+      user.isVerified = true;
+      user.verificationToken = null; // Clear the token after verification
+      await user.save();
 
-    user.isVerified = true;
-    user.verificationToken = null; // Clear the token after verification
-    await user.save();
+      console.log("User verification status updated:", user.isVerified);  // Log the updated verification status
 
-    console.log("User verification status updated:", user.isVerified);  // Log the updated verification status
-
-    res.json({ message: 'Email verified successfully!' });
+      res.json({ message: 'Email verified successfully!' });
   } catch (error) {
-    console.error("Error during verification:", error);  // Log any errors that occur
-    res.status(500).json({ message: 'Server error. Please try again later.' });
+      console.error("Error during verification:", error);  // Log any errors that occur
+      res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 });
+
 
 
 
