@@ -8,7 +8,12 @@ const levels = {
 };
 
 const words = [
-  // Your list of words...
+  'grid', 'swift', 'rails', 'ruby', 'python', 'java', 'tech', 'clear', 'echo', 'let',
+  'wall', 'laughter', 'hash', 'kotlin', 'mobile', 'android', 'javascript', 'web', 'program',
+  'coding', 'basic', 'foodie', 'work', 'case', 'react', 'dragon', 'rush', 'api', 'virtual',
+  'nerd', 'google', 'float', 'docker', 'block', 'rank', 'class', 'machine', 'perfect',
+  'deploy', 'terminal', 'array', 'vue', 'node', 'issue', 'front', 'grid', 'geek', 'mac',
+  'console', 'clone', 'heroku', 'slack', 'version', 'control', 'data', 'npm', 'developer',
 ];
 
 function Game() {
@@ -26,7 +31,7 @@ function Game() {
 
   const navigate = useNavigate();
 
-  // Update high scores
+  // Function to update high scores
   const updateHighScores = useCallback(() => {
     const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
     if (username) {
@@ -44,11 +49,12 @@ function Game() {
     }
   }, [score, username]);
 
+  // Function to end the game
   const endGame = useCallback(() => {
     setIsPlaying(false);
     setMessage('Game Over!');
     setFinalScore(score);
-    updateHighScores();
+    updateHighScores(); // Call to update high scores
     setShowGameOverModal(true);
   }, [score, updateHighScores]);
 
@@ -82,10 +88,11 @@ function Game() {
     if (wordInput.toLowerCase() === currentWord.toLowerCase()) {
       setScore(prevScore => prevScore + 1);
       setWordInput('');
-      generateWord();
-      setTime(currentLevel);
+      generateWord(); // Generate a new word immediately
+      setTime(currentLevel); // Reset the timer
       setMessage('Good Job!');
 
+      // Update high score if necessary
       if (score + 1 > highScore) {
         localStorage.setItem('highScore', score + 1);
         setHighScore(score + 1);
@@ -110,6 +117,7 @@ function Game() {
     navigate('/leaderboard');
   }
 
+  // Logout function
   function handleLogout() {
     localStorage.removeItem('username');
     localStorage.removeItem('highScore');
@@ -151,7 +159,7 @@ function Game() {
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
-            checkWord();
+            checkWord(); // Call checkWord on Enter key press
           }
         }}
         placeholder="Type the word..."
